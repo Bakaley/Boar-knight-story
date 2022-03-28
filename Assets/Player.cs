@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
@@ -18,25 +19,35 @@ public class Player : MonoBehaviour
     SpriteRenderer spriteRenderer;
     new Rigidbody2D rigidbody2D;
     Animator animator;
+    PlayerInput playerInput;
+    
 
     private void Awake()
     {
+        Application.targetFrameRate = 60;
+
         spriteRenderer = GetComponent<SpriteRenderer>();
         rigidbody2D = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+        playerInput = GetComponent<PlayerInput>();
     }
 
     void Update()
     {
-        //GetAxisRaw возвращает 0, 1 и -1 без промежуточных значений, чтобы герой не скользил при остановке
-        float x = Input.GetAxisRaw("Horizontal");
-        float y = Input.GetAxisRaw("Vertical");
+        movementDirection = playerInput.actions["Move"].ReadValue<Vector2>();
+        float x = movementDirection.x;
+        float y = movementDirection.y;
 
-        if (x > 0.01) GetComponent<SpriteRenderer>().flipX = true;
-        else if (x < -0.01) GetComponent<SpriteRenderer>().flipX = false;
-        
-        
-        movementDirection = new Vector3(x, y);
+        Debug.Log(x + " " + y);
+
+        //sprite.flip не флипает 2д коллайдер, поэтому
+        void flip()
+        {
+            transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
+        }
+
+        if (x > 0.01 && transform.localScale.x > 0) flip();
+        else if (x < -0.01 && transform.localScale.x < 0) flip();
 
         animator.SetFloat("MovementSpeed", movementDirection.magnitude);
     }
@@ -48,12 +59,10 @@ public class Player : MonoBehaviour
 
     private void LateUpdate()
     {
-        // get current grid location
         Vector3Int currentCell = tilemap.WorldToCell(transform.position);
 
-        tilemap.SetTile(currentCell, null);
+        //tilemap.SetTile(currentCell, null);
 
-        // add one in a direction (you'll have to change this to match your directional control)
 
     }
 }
