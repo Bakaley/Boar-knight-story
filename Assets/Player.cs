@@ -9,9 +9,10 @@ public class Player : MonoBehaviour
 
     [SerializeField]
     Tilemap tilemap;
+    [SerializeField]
+    GameObject bomb;
 
-
-    //[SerializeField]
+    [SerializeField]
     float speedModifier = 1f;
 
     Vector2 movementDirection = Vector2.zero;
@@ -20,7 +21,7 @@ public class Player : MonoBehaviour
     new Rigidbody2D rigidbody2D;
     Animator animator;
     PlayerInput playerInput;
-    
+    BoxCollider2D collider2d;
 
     private void Awake()
     {
@@ -30,6 +31,12 @@ public class Player : MonoBehaviour
         rigidbody2D = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         playerInput = GetComponent<PlayerInput>();
+        collider2d = GetComponent<BoxCollider2D>();
+    }
+
+    private void Start()
+    {
+        playerInput.actions["Bomb"].performed += _ =>  spawnBomb();
     }
 
     void Update()
@@ -37,8 +44,6 @@ public class Player : MonoBehaviour
         movementDirection = playerInput.actions["Move"].ReadValue<Vector2>();
         float x = movementDirection.x;
         float y = movementDirection.y;
-
-        Debug.Log(x + " " + y);
 
         //sprite.flip не флипает 2д коллайдер, поэтому
         void flip()
@@ -50,6 +55,7 @@ public class Player : MonoBehaviour
         else if (x < -0.01 && transform.localScale.x < 0) flip();
 
         animator.SetFloat("MovementSpeed", movementDirection.magnitude);
+
     }
 
     private void FixedUpdate()
@@ -57,12 +63,10 @@ public class Player : MonoBehaviour
         rigidbody2D.MovePosition(rigidbody2D.position + movementDirection * Time.fixedDeltaTime * speedModifier);
     }
 
-    private void LateUpdate()
+
+    void spawnBomb()
     {
-        Vector3Int currentCell = tilemap.WorldToCell(transform.position);
-
-        //tilemap.SetTile(currentCell, null);
-
-
+        Instantiate(bomb, tilemap.GetCellCenterWorld(tilemap.WorldToCell(transform.localPosition)), Quaternion.identity);
     }
+
 }
