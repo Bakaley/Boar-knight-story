@@ -56,6 +56,7 @@ public class Player : MonoBehaviour
 
         animator.SetFloat("MovementSpeed", movementDirection.magnitude);
 
+
     }
 
     private void FixedUpdate()
@@ -66,7 +67,7 @@ public class Player : MonoBehaviour
 
     void spawnBomb()
     {
-        Instantiate(bomb, tilemap.GetCellCenterWorld(tilemap.WorldToCell(transform.localPosition)), Quaternion.identity);
+        Instantiate(bomb, tilemap.GetCellCenterWorld(tilemap.WorldToCell(transform.position)), Quaternion.identity);
     }
 
 }
