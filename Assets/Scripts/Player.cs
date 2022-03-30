@@ -8,13 +8,16 @@ using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour, IDamagable
 {
-
+    
+    [SerializeField]
+    UIManager ui;
     [SerializeField]
     Tilemap tilemap;
     [SerializeField]
     GameObject bomb;
     [SerializeField]
     float speedModifier = 1f;
+    [SerializeField]
 
     int startHP = 3;
     int currentHP = 3;
@@ -127,6 +130,13 @@ public class Player : MonoBehaviour, IDamagable
     public void die(float time)
     {
         speedModifier = 0;
+        Invoke("lose", .5f);
+    }
+
+    //не очень красиво так вызывать окна, но времени больше нет
+    void lose()
+    {
+        ui.showLoseWindow();
     }
 
     public event EventHandler<int> OnHPchange;

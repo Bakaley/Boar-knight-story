@@ -11,6 +11,10 @@ public class UIManager : MonoBehaviour
     GameObject heart;
     [SerializeField]
     Player player;
+    [SerializeField]
+    GameObject loseWindow;
+    [SerializeField]
+    GameObject winWindow;
 
     List<GameObject> hearts
     {
@@ -39,4 +43,15 @@ public class UIManager : MonoBehaviour
         if (diff < 0) Destroy(hearts[0]);
         else Instantiate(heart, hpContainer.transform);
     }
+
+    public void showWinWindow()
+    {
+        winWindow.SetActive(true);
+    }
+
+    public void showLoseWindow()
+    {
+        loseWindow.SetActive(true);
+    }
+
 }

@@ -89,6 +89,8 @@ public class Bomb : MonoBehaviour
                     if (unit != null) unit.sufferDamage();
                     IPushable obst = hit.collider.GetComponent<IPushable>();
                     if (obst != null) obst.push(new Vector2(offset.x, offset.y));
+                    ISparkable monolith = hit.collider.GetComponent<ISparkable>();
+                    if (monolith != null) monolith.sparkActivate();
 
 
                 }
