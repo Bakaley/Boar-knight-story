@@ -130,13 +130,13 @@ TextureImporter:
     second: knight_41
   - first:
       213: -337083360398791008
-    second: knight_42
+    second: die_0
   - first:
       213: 8860934325010919463
-    second: knight_43
+    second: die_1
   - first:
       213: -1189351286803860727
-    second: knight_44
+    second: die_2
   - first:
       213: -3131257522377833012
     second: knight_45
@@ -157,7 +157,7 @@ TextureImporter:
     second: knight_50
   - first:
       213: -8294548535756456274
-    second: knight_51
+    second: die_3
   - first:
       213: -6564784874402902509
     second: knight_52
@@ -1159,13 +1159,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: knight_42
+      name: die_0
       rect:
         serializedVersion: 2
-        x: 912
-        y: 153
-        width: 51
-        height: 81
+        x: 902
+        y: 154
+        width: 60
+        height: 82
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1180,12 +1180,12 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: knight_43
+      name: die_1
       rect:
         serializedVersion: 2
-        x: 1056
-        y: 153
-        width: 51
+        x: 1043
+        y: 154
+        width: 65
         height: 78
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
@@ -1201,13 +1201,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: knight_44
+      name: die_2
       rect:
         serializedVersion: 2
-        x: 1200
-        y: 153
-        width: 51
-        height: 81
+        x: 1186
+        y: 154
+        width: 65
+        height: 80
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1348,13 +1348,13 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: knight_51
+      name: die_3
       rect:
         serializedVersion: 2
-        x: 915
+        x: 904
         y: 3
-        width: 42
-        height: 69
+        width: 57
+        height: 78
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}

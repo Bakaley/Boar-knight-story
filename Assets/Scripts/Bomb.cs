@@ -67,7 +67,7 @@ public class Bomb : MonoBehaviour
             if (columns.GetTile(currentCell) == null && bounds.GetTile(currentCell) == null)
             {
                 //наносим урон в клетку
-                bool damageWasDealt = TilemapManager.StaticInstance.dealDamage(currentCell);
+                bool damageWasDealt = TilemapManager.StaticInstance.hitCell(currentCell);
                 if (damageWasDealt)
                 {
 
@@ -79,7 +79,8 @@ public class Bomb : MonoBehaviour
                 RaycastHit2D[] raycastHits = Physics2D.BoxCastAll(new Vector2(worldPos.x, worldPos.y), new Vector2(.95f, .95f), 0, Vector2.zero, float.PositiveInfinity, mask);
                 foreach (RaycastHit2D hit in raycastHits)
                 {
-                    if (hit.collider) Debug.Log(hit.collider.gameObject);
+                    IDamagable unit = hit.collider.GetComponent<IDamagable>();
+                    if (unit != null) unit.sufferDamage(Player.BombDamage);
                 }
                 Instantiate(exploseSampler, worldPos, Quaternion.Euler(0, 0, angle));
             }

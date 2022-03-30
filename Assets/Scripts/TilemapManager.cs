@@ -61,7 +61,7 @@ public class TilemapManager : MonoBehaviour
     }
 
     //возвращает true, если блоку был нансён урон
-    public bool dealDamage(Vector3Int cell)
+    public bool hitCell(Vector3Int cell)
     {
         TileBase tile = obstacles.GetTile(cell);
         //switch case можно использовать только для постоянных значений, а сериализуемые поля таковыми не являются, поэтому if else 
