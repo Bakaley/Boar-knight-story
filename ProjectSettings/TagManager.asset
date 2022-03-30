@@ -15,9 +15,9 @@ TagManager:
   - Player
   - PlayerIgnore
   - Monster
-  - 
-  - 
-  - 
+  - DamageCollidingIgnore
+  - Obstacle
+  - MovingObstacle
   - 
   - 
   - 

@@ -25,6 +25,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
+
     private void Start()
     {
         while (hearts.Count > player.StartHP) Destroy(hearts[0]);

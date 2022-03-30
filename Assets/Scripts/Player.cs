@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
 using System;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour, IDamagable
 {
@@ -13,11 +14,8 @@ public class Player : MonoBehaviour, IDamagable
     [SerializeField]
     GameObject bomb;
     [SerializeField]
-    int startBombDamage = 1;
-    [SerializeField]
     float speedModifier = 1f;
 
-    [SerializeField]
     int startHP = 3;
     int currentHP = 3;
 
@@ -33,6 +31,8 @@ public class Player : MonoBehaviour, IDamagable
     Animator animator;
     PlayerInput playerInput;
 
+    float invulnerabilityTimer = 1f;
+    bool invulnerable = false;
     private void Awake()
     {
         Application.targetFrameRate = 60;
@@ -43,12 +43,15 @@ public class Player : MonoBehaviour, IDamagable
         playerInput = GetComponent<PlayerInput>();
 
         currentHP = startHP;
-        BombDamage = startBombDamage;
     }
 
     private void Start()
     {
-        playerInput.actions["Bomb"].performed += _ =>  spawnBomb();
+        //можно было бы использовать аргумент дискардинг, но тогда мы не сможем отписатьс€
+        //а отписыватьс€ надо, т.к. когда мы перезагружаем сцену, прив€зки остаютс€, а экземл€ра игрока уже нет
+        playerInput.actions["Bomb"].performed += spawnBomb;
+        playerInput.actions["Restart"].performed += restartLevel;
+
     }
 
     void Update()
@@ -57,15 +60,15 @@ public class Player : MonoBehaviour, IDamagable
         float x = movementDirection.x;
         float y = movementDirection.y;
 
-        //sprite.flip не флипает 2д коллайдер, поэтому
-        void flip()
+        //sprite.flip не флипает 2д коллайдер, поэтому поворачиваем весь объект
+        //но только пока герой жив
+        if(speedModifier != 0)
         {
-            if(speedModifier!=0) transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
+            if (x > 0.01) transform.rotation = Quaternion.Euler(0, 180, 0);
+            else if (x < -0.01) transform.rotation = Quaternion.Euler(0, 0, 0);
         }
 
-        if (x > 0.01 && transform.localScale.x > 0) flip();
-        else if (x < -0.01 && transform.localScale.x < 0) flip();
-
+        //мен€ем анимацию на движение/покой
         animator.SetFloat("MovementSpeed", movementDirection.magnitude * speedModifier);
 
 
@@ -77,18 +80,42 @@ public class Player : MonoBehaviour, IDamagable
     }
 
 
-    void spawnBomb()
+
+    void spawnBomb(InputAction.CallbackContext _)
     {
+        //если в этой клетке уже есть бомба, то ничего не делаем
+        //посколько бомбы прив€заны к центрам клетки, то castBox надо делать из центра клетки
+        //получаем клетку
+        Tilemap map = TilemapManager.StaticInstance.FloorTilemap;
+        Vector3Int cell = map.WorldToCell(transform.position);
+        //получаем центр клетки
+        Vector2 worldPos = map.GetCellCenterWorld(cell);
+        //все коллайдеры в текущей клетке
+        RaycastHit2D[] raycastHits = Physics2D.BoxCastAll(new Vector2(worldPos.x, worldPos.y), new Vector2(.95f, .95f), 0, Vector2.zero);
+        foreach (RaycastHit2D hit in raycastHits)
+        {
+            if (hit.collider.gameObject.CompareTag("Bomb")) return;
+        }
+
         Instantiate(bomb, tilemap.GetCellCenterWorld(tilemap.WorldToCell(transform.position)), Quaternion.identity);
     }
 
-    public void sufferDamage(int damage)
+    public void sufferDamage()
     {
-        //игрок не может потер€ть больше одного хп за удар
+        if (invulnerable) return;
         currentHP--;
-        animator.SetInteger("HP", currentHP);
-        OnHPchange?.Invoke(this, -1);
-        if (currentHP <= 0) die(.5f);
+
+        if (currentHP > 0)
+        {
+            //таймер неу€звимости после получени€ урона
+            startInvulnerability(invulnerabilityTimer);
+        }
+        if(currentHP >= 0)
+        {
+            animator.SetInteger("HP", currentHP);
+            OnHPchange?.Invoke(this, -1);
+        }
+        if (currentHP == 0) die(.5f);
     }
 
     public void heal()
@@ -104,8 +131,33 @@ public class Player : MonoBehaviour, IDamagable
 
     public event EventHandler<int> OnHPchange;
 
-    public static int BombDamage
+    void startInvulnerability(float time)
     {
-        get; private set;
+        invulnerable = true;
+        //включаем игнорирование коллизий с дамажащими объектами
+        gameObject.layer = 9;
+        //включаем мерцание спрайта
+        animator.SetLayerWeight(1, 1);
+        Invoke("stopInvulnerability", time);
+    }
+
+    void stopInvulnerability()
+    {
+        invulnerable = false;
+        //выключаем игнорирование коллизий с дамажащими объектами
+        gameObject.layer = 6;
+        //выключаем мерцание спрайта
+        animator.SetLayerWeight(1, 0);
+    }
+
+    void restartLevel(InputAction.CallbackContext _)
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    private void OnDestroy()
+    {
+        playerInput.actions["Bomb"].performed -= spawnBomb;
+        playerInput.actions["Restart"].performed -= restartLevel;
     }
 }

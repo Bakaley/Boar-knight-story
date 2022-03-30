@@ -37,6 +37,12 @@ public class Bomb : MonoBehaviour
         bombTimer.onTimerEnd += timerEndHandler;
     }
 
+    private void Start()
+    {
+
+
+    }
+
     //выход игрока из клетки с заспавненной бомбой включает коллизию с этой бомбой
     private void OnTriggerExit2D(Collider2D otherCollider)
     {
@@ -74,13 +80,17 @@ public class Bomb : MonoBehaviour
                 }
 
                 Vector2 worldPos = obstacles.GetCellCenterWorld(currentCell);
-                //кастуем BoxCollider
+                //кастуем BoxCollider в клетку размером с неё саму
                 int mask = ~(LayerMask.GetMask("Ignore Raycast"));
                 RaycastHit2D[] raycastHits = Physics2D.BoxCastAll(new Vector2(worldPos.x, worldPos.y), new Vector2(.95f, .95f), 0, Vector2.zero, float.PositiveInfinity, mask);
                 foreach (RaycastHit2D hit in raycastHits)
                 {
                     IDamagable unit = hit.collider.GetComponent<IDamagable>();
-                    if (unit != null) unit.sufferDamage(Player.BombDamage);
+                    if (unit != null) unit.sufferDamage();
+                    IPushable obst = hit.collider.GetComponent<IPushable>();
+                    if (obst != null) obst.push(new Vector2(offset.x, offset.y));
+
+
                 }
                 Instantiate(exploseSampler, worldPos, Quaternion.Euler(0, 0, angle));
             }

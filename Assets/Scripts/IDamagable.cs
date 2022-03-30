@@ -5,7 +5,7 @@ using UnityEngine;
 public interface IDamagable
 {
     //игрок не может потерять больше одного сердца за удар, а вот урон от бомбы может быть разным
-    void sufferDamage(int damage);
+    void sufferDamage();
 
     void die(float time);
 }

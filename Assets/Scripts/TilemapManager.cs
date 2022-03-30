@@ -64,7 +64,8 @@ public class TilemapManager : MonoBehaviour
     public bool hitCell(Vector3Int cell)
     {
         TileBase tile = obstacles.GetTile(cell);
-        //switch case можно использовать только для постоянных значений, а сериализуемые поля таковыми не являются, поэтому if else 
+        //switch case можно использовать только для постоянных значений, а сериализуемые поля таковыми не являются, поэтому делаем всё руками и некрасиво
+
         if (tile == wall3HP)
         {
             obstacles.SetTile(cell, wall2HP);

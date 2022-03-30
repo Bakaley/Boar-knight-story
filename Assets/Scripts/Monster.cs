@@ -6,6 +6,7 @@ public class Monster : MonoBehaviour, IDamagable
 {
     public enum BEHAVIOR_TYPE
     {
+        STANDING,
         HORIZONTAL_PATROL,
         VERTICAL_PATROL,
         RANDOM_DIRECTION
@@ -48,11 +49,12 @@ public class Monster : MonoBehaviour, IDamagable
     {
         switch (behavior)
         {
+            case BEHAVIOR_TYPE.STANDING:
+                speedModifier = 0;
+                break;
             case BEHAVIOR_TYPE.HORIZONTAL_PATROL:
                 //Random.Range(0, 2) == 0 возвращает true/false с одинаковой вероятностью 
                 movementDirection = Random.Range(0, 2) == 0 ? directions[0] : directions[1];
-                if (movementDirection.x > 0 && transform.localScale.x > 0) flip();
-                else if (movementDirection.x < -0.01 && transform.localScale.x < 0) flip();
                 break;
             case BEHAVIOR_TYPE.VERTICAL_PATROL:
                 movementDirection = Random.Range(0, 2) == 0 ? directions[2] : directions[3];
@@ -66,7 +68,8 @@ public class Monster : MonoBehaviour, IDamagable
     private void Update()
     {
         animator.SetFloat("MovementSpeed", speedModifier);
-
+        if (movementDirection.x > 0) transform.rotation = Quaternion.Euler(0, 180, 0);
+        else if (movementDirection.x < 0) transform.rotation = Quaternion.Euler(0, 0, 0);
     }
 
     private void FixedUpdate()
@@ -74,35 +77,36 @@ public class Monster : MonoBehaviour, IDamagable
         rigidbody2D.MovePosition(rigidbody2D.position + movementDirection * Time.fixedDeltaTime * speedModifier);
     }
 
-    void flip()
-    {
-        transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
-    }
-
 
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         //наносим угроку урон при столкновении
-        if (collision.collider.gameObject.CompareTag("Player")) collision.collider.gameObject.GetComponent<IDamagable>().sufferDamage(1);
+        if (collision.collider.gameObject.CompareTag("Player")) collision.collider.gameObject.GetComponent<IDamagable>().sufferDamage();
         //если это не игрок, то разворачиваемся
         else
         {
             movementDirection = movementDirection * -1;
-            if (movementDirection.x > 0 && transform.localScale.x > 0) flip();
-            else if (movementDirection.x < 0 && transform.localScale.x < 0) flip();
         }
     }
 
-    public void sufferDamage(int damage)
+    private void OnCollisionStay2D(Collision2D collision)
     {
-        currentHP-= damage;
+        if (behavior == BEHAVIOR_TYPE.RANDOM_DIRECTION) movementDirection = directions[Random.Range(0, 4)];
+
+
+    }
+
+    public void sufferDamage()
+    {
+        currentHP--;
         animator.SetInteger("HP", currentHP);
         if (currentHP <= 0) die(.5f);
     }
 
     public void die(float time)
     {
+        GetComponent<Collider2D>().enabled = false;
         speedModifier = 0;
         Invoke("DestroyObj", time);
     }
@@ -111,4 +115,5 @@ public class Monster : MonoBehaviour, IDamagable
     {
         Destroy(gameObject);
     }
+
 }
